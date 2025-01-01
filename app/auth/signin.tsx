@@ -9,60 +9,58 @@ import {
   Keyboard,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useColorScheme, TextInput  } from "react-native";
-
-import { GestureHandlerRootView } from "react-native-gesture-handler"; // Import GestureHandlerRootView
+import { useColorScheme, TextInput } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
 
 const SignIn = () => {
   const systemTheme = useColorScheme(); // Detect system theme (either 'light' or 'dark')
   const router = useRouter(); // Initialize Expo Router's useRouter hook
-  // State to manage password visibility and password input
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState(""); // Track the password input
-  const [loading, setLoading] = useState(false); // Loading state for sign-in process
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [emailFocused, setEmailFocused] = useState(false); // Track focus state of email input
+  const [passwordFocused, setPasswordFocused] = useState(false); // Track focus state of password input
 
-  // Toggle password visibility
   const togglePasswordVisibility = () => {
     setPasswordVisible((prevState) => !prevState);
   };
 
-  // Handle Sign In button click
   const handleSignIn = () => {
     if (!email || !password) {
-      alert("Please enter both email and password.");
+      // alert("Please enter both email and password.");
+      router.replace("/Home");
       return;
     }
-    // Start loading state (you can replace this with an actual sign-in API request)
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      // Handle sign-in success here
     }, 2000);
+    if (loading === false) {
+      router.replace("/Home");
+    }
   };
 
   return (
-    // Wrap the entire component with GestureHandlerRootView
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaView
         className={`flex-1 ${
           systemTheme === "dark" ? "bg-custom-dark" : "bg-custom-light"
         }`}
       >
-        {/* TouchableWithoutFeedback to dismiss keyboard on touch outside */}
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
           <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"} // Adjust for iOS and Android
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
             style={{ flex: 1 }}
           >
             <View className="flex-1 justify-center items-center p-5">
               <Text
                 className={`text-3xl font-bold mb-10 ${
                   systemTheme === "dark"
-                    ? "text-custom-dark"
-                    : "text-custom-light"
+                    ? "text-custom-light"
+                    : "text-custom-dark"
                 }`}
               >
                 Sign In
@@ -71,16 +69,22 @@ const SignIn = () => {
               {/* Email TextInput Component */}
               <TextInput
                 editable
-                value={email} // Bind the value to the email state
-                onChangeText={setEmail} // Update state on text change
-                className={`w-full p-5 rounded-md mb-4  ${
+                value={email}
+                onChangeText={setEmail}
+                onFocus={() => setEmailFocused(true)}
+                onBlur={() => setEmailFocused(false)}
+                className={`w-full p-5 rounded-md mb-4 ${
+                  emailFocused
+                    ? "border-2 border-green-500"
+                    : "border border-gray-400" // Set default gray border when not focused
+                } ${
                   systemTheme === "dark"
                     ? "bg-custom-input-dark text-custom-dark"
                     : "bg-custom-input-light text-custom-light"
                 }`}
                 placeholder="Email"
-                keyboardType="email-address" // Setting keyboard type for email
-                autoCapitalize="none" // Avoid auto-capitalization
+                keyboardType="email-address"
+                autoCapitalize="none"
                 placeholderTextColor="#C7C7CD"
               />
 
@@ -88,19 +92,23 @@ const SignIn = () => {
               <View className="relative w-full">
                 <TextInput
                   editable
-                  value={password} // Bind the value to the password state
-                  onChangeText={setPassword} // Update state on text change
-                  className={`w-full p-5 rounded-md mb-6  ${
+                  value={password}
+                  onChangeText={setPassword}
+                  onFocus={() => setPasswordFocused(true)}
+                  onBlur={() => setPasswordFocused(false)}
+                  className={`w-full p-5 rounded-md mb-6 ${
+                    passwordFocused
+                      ? "border-2 border-green-500"
+                      : "border border-gray-400" // Set default gray border when not focused
+                  } ${
                     systemTheme === "dark"
                       ? "bg-custom-input-dark text-custom-dark"
                       : "bg-custom-input-light text-custom-light"
                   }`}
                   placeholder="Password"
                   placeholderTextColor="#C7C7CD"
-                  secureTextEntry={!passwordVisible} // Toggle password visibility
+                  secureTextEntry={!passwordVisible}
                 />
-
-                {/* Conditionally render Eye Icon to Toggle Password Visibility */}
                 {password.length > 0 && (
                   <TouchableOpacity
                     onPress={togglePasswordVisibility}
@@ -108,15 +116,14 @@ const SignIn = () => {
                   >
                     <MaterialIcons
                       className="mb-6"
-                      name={passwordVisible ? "visibility" : "visibility-off"} // MaterialIcons names
+                      name={passwordVisible ? "visibility" : "visibility-off"}
                       size={24}
-                      color={systemTheme === "dark" ? "#fff" : "#000"} // Adjust color based on theme
+                      color={systemTheme === "dark" ? "#fff" : "#000"}
                     />
                   </TouchableOpacity>
                 )}
               </View>
 
-              {/* Continue Button */}
               <TouchableOpacity
                 onPress={handleSignIn}
                 className="w-full bg-green-500 justify-center items-center mb-6 py-4 rounded-md"
@@ -125,16 +132,20 @@ const SignIn = () => {
                   {loading ? "Signing In..." : "Sign In"}
                 </Text>
               </TouchableOpacity>
+
               <Text
                 className={`${
                   systemTheme === "dark"
-                    ? "text-custom-dark"
-                    : "text-custom-light"
+                    ? "text-custom-light"
+                    : "text-custom-dark"
                 }`}
               >
                 Don't have an account?{" "}
-                <Text className="text-custom-green" onPress={()=>{router.push("/auth/signin")}}>
-                  <Link href="/auth/signup">Signup</Link>
+                <Text
+                  className="text-custom-green"
+                  onPress={() => router.push("/auth/signup")}
+                >
+                  Signup
                 </Text>
               </Text>
             </View>

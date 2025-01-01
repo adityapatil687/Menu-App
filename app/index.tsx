@@ -7,8 +7,8 @@ import React from "react";
 export default function Index() {
   return (
     <>
-      {/* <Boarding /> */}
-      <Home />
+      <Boarding />
+      {/* <Home /> */}
     </>
   );
 }

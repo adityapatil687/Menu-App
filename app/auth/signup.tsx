@@ -10,7 +10,7 @@ import {
   Keyboard,
   ScrollView,
   Image,
-  Alert,
+  KeyboardTypeOptions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useColorScheme } from "react-native";
@@ -22,18 +22,21 @@ import { useRouter } from "expo-router"; // Use Expo Router's useRouter hook
 const SignUp = () => {
   const systemTheme = useColorScheme(); // Detect system theme (either 'light' or 'dark')
 
-  // State to manage user input and visibility
+  // State to manage user input, visibility, and focus
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [restaurantName, setRestaurantName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [passwordVisible, setPasswordVisible] = useState(false);
-  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
+  const [password, setPassword] = useState(""); // Password state
+  const [confirmPassword, setConfirmPassword] = useState(""); // Confirm Password state
+  const [passwordVisible, setPasswordVisible] = useState(false); // Visibility for password
+  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false); // Visibility for confirm password
   const [profilePic, setProfilePic] = useState(""); // Store profile picture
   const [loading, setLoading] = useState(false);
+
+  // Focus state for borders
+  const [focusedField, setFocusedField] = useState<string | null>(null);
 
   const router = useRouter(); // Initialize Expo Router's useRouter hook
 
@@ -42,13 +45,14 @@ const SignUp = () => {
     setPasswordVisible((prevState) => !prevState);
   };
 
+  // Toggle confirm password visibility
   const toggleConfirmPasswordVisibility = () => {
     setConfirmPasswordVisible((prevState) => !prevState);
   };
 
+  // Profile picture picker
   const handleImagePick = async () => {
     try {
-      // Launch image picker
       let result = await ImagePicker.launchImageLibraryAsync({
         allowsEditing: true,
         aspect: [1, 1],
@@ -58,28 +62,22 @@ const SignUp = () => {
       if (!result.canceled) {
         const imageUri = result.assets[0].uri;
 
-        // Convert image to base64 to calculate exact size
+        // Validate image size
         const base64Image = await FileSystem.readAsStringAsync(imageUri, {
           encoding: FileSystem.EncodingType.Base64,
         });
-
-        // Calculate file size from base64 string length
         const fileSizeInBytes = (base64Image.length * 3) / 4; // Approximation
-        console.log("Calculated File Size:", fileSizeInBytes, "bytes");
-
-        // Allow image up to 750 KB
         if (fileSizeInBytes > 750000) {
-          // 750 KB
           alert("Please select an image smaller than 750 KB.");
         } else {
-          setProfilePic(imageUri); // Set the profile picture if size is valid
+          setProfilePic(imageUri);
         }
       } else {
-        alert("You did not select any image.");
+        alert("No image selected.");
       }
     } catch (error) {
       console.error("Error picking image:", error);
-      alert("An error occurred while picking the image. Please try again.");
+      alert("An error occurred while picking the image.");
     }
   };
 
@@ -102,12 +100,10 @@ const SignUp = () => {
       return;
     }
     setLoading(true);
-    // Simulate a sign-up process
     setTimeout(() => {
       setLoading(false);
       alert("Signed up successfully!");
-      // Navigate to the Sign In screen after successful sign up
-      router.back(); // Using Expo Router's push for navigation
+      router.back();
     }, 2000);
   };
 
@@ -117,8 +113,7 @@ const SignUp = () => {
         systemTheme === "dark" ? "bg-custom-dark" : "bg-custom-light"
       }`}
     >
-      {/* TouchableWithoutFeedback to dismiss keyboard */}
-      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={{ flex: 1 }}
@@ -127,7 +122,7 @@ const SignUp = () => {
             <View className="flex-1 justify-center items-center">
               <Text
                 className={`text-3xl font-bold mb-5 ${
-                  systemTheme === "dark"
+                  systemTheme === "light"
                     ? "text-custom-dark"
                     : "text-custom-light"
                 }`}
@@ -135,7 +130,7 @@ const SignUp = () => {
                 Sign Up
               </Text>
 
-              {/* Profile Picture Upload */}
+              {/* Profile Picture */}
               <TouchableOpacity
                 onPress={handleImagePick}
                 style={{
@@ -143,11 +138,11 @@ const SignUp = () => {
                   height: 120,
                   borderRadius: 60,
                   marginBottom: 20,
-                  backgroundColor: systemTheme === "dark" ? "#333" : "#eee",
+                  backgroundColor: systemTheme === "dark" ? "#27272a" : "#f4f4f5",
                   justifyContent: "center",
                   alignItems: "center",
                   borderWidth: 2,
-                  borderColor: systemTheme === "dark" ? "#fff" : "#000",
+                  borderColor: "#d1d5db", // Gray border
                 }}
               >
                 {profilePic ? (
@@ -167,126 +162,100 @@ const SignUp = () => {
                 )}
               </TouchableOpacity>
 
-              {/* First Name */}
-              <TextInput
-                value={firstName}
-                onChangeText={setFirstName}
-                className={`w-full p-5 rounded-md mb-4 ${
-                  systemTheme === "dark"
-                    ? "bg-custom-input-dark text-custom-dark"
-                    : "bg-custom-input-light text-custom-light"
-                }`}
-                placeholder="First Name"
-                placeholderTextColor="#C7C7CD"
-              />
+              {[ 
+                { label: "First Name", value: firstName, setter: setFirstName },
+                { label: "Last Name", value: lastName, setter: setLastName },
+                { label: "Restaurant Name", value: restaurantName, setter: setRestaurantName },
+                { label: "Email", value: email, setter: setEmail },
+                { label: "Phone Number", value: phoneNumber, setter: setPhoneNumber, keyboardType: "phone-pad" }
+              ].map((field, index) => (
+                <TextInput
+                  key={index}
+                  value={field.value}
+                  onChangeText={field.setter}
+                  onFocus={() => setFocusedField(field.label)}
+                  onBlur={() => setFocusedField(null)}
+                  className={`w-full p-5 rounded-md mb-4 ${
+                    focusedField === field.label
+                      ? "border-2 border-green-500"
+                      : "border border-gray-400" // Gray border when not focused
+                  } ${
+                    systemTheme === "dark"
+                      ? "bg-custom-input-dark text-custom-light"
+                      : "bg-custom-input-light text-custom-dark"
+                  }`}
+                  placeholder={field.label}
+                  keyboardType={field.keyboardType as KeyboardTypeOptions || "default"}
+                  placeholderTextColor="#C7C7CD"
+                />
+              ))}
 
-              {/* Last Name */}
-              <TextInput
-                value={lastName}
-                onChangeText={setLastName}
-                className={`w-full p-5 rounded-md mb-4 ${
-                  systemTheme === "dark"
-                    ? "bg-custom-input-dark text-custom-dark"
-                    : "bg-custom-input-light text-custom-light"
-                }`}
-                placeholder="Last Name"
-                placeholderTextColor="#C7C7CD"
-              />
-
-              {/* Restaurant Name */}
-              <TextInput
-                value={restaurantName}
-                onChangeText={setRestaurantName}
-                className={`w-full p-5 rounded-md mb-4 ${
-                  systemTheme === "dark"
-                    ? "bg-custom-input-dark text-custom-dark"
-                    : "bg-custom-input-light text-custom-light"
-                }`}
-                placeholder="Restaurant Name"
-                placeholderTextColor="#C7C7CD"
-              />
-
-              {/* Email */}
-              <TextInput
-                value={email}
-                onChangeText={setEmail}
-                className={`w-full p-5 rounded-md mb-4 ${
-                  systemTheme === "dark"
-                    ? "bg-custom-input-dark text-custom-dark"
-                    : "bg-custom-input-light text-custom-light"
-                }`}
-                placeholder="Email"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                placeholderTextColor="#C7C7CD"
-              />
-
-              {/* Phone Number */}
-              <TextInput
-                value={phoneNumber}
-                onChangeText={setPhoneNumber}
-                className={`w-full p-5 rounded-md mb-4 ${
-                  systemTheme === "dark"
-                    ? "bg-custom-input-dark text-custom-dark"
-                    : "bg-custom-input-light text-custom-light"
-                }`}
-                placeholder="Phone Number"
-                keyboardType="phone-pad"
-                placeholderTextColor="#C7C7CD"
-              />
-
-              {/* Password */}
+              {/* Password Input */}
               <View className="relative w-full mb-4">
                 <TextInput
                   value={password}
                   onChangeText={setPassword}
+                  onFocus={() => setFocusedField("Password")}
+                  onBlur={() => setFocusedField(null)}
                   className={`w-full p-5 rounded-md ${
+                    focusedField === "Password"
+                      ? "border-2 border-green-500"
+                      : "border border-gray-400" // Gray border when not focused
+                  } ${
                     systemTheme === "dark"
-                      ? "bg-custom-input-dark text-custom-dark"
-                      : "bg-custom-input-light text-custom-light"
+                      ? "bg-custom-input-dark text-custom-light"
+                      : "bg-custom-input-light text-custom-dark"
                   }`}
                   placeholder="Password"
                   secureTextEntry={!passwordVisible}
                   placeholderTextColor="#C7C7CD"
                 />
-                <TouchableOpacity
-                  onPress={togglePasswordVisibility}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2"
-                >
-                  <MaterialIcons
-                    name={passwordVisible ? "visibility" : "visibility-off"}
-                    size={24}
-                    color={systemTheme === "dark" ? "#fff" : "#000"}
-                  />
-                </TouchableOpacity>
+                {password.length > 0 && ( // Only show eye icon when data is entered
+                  <TouchableOpacity
+                    onPress={togglePasswordVisibility}
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2"
+                  >
+                    <MaterialIcons
+                      name={passwordVisible ? "visibility" : "visibility-off"}
+                      size={24}
+                      color={systemTheme === "dark" ? "#fff" : "#000"}
+                    />
+                  </TouchableOpacity>
+                )}
               </View>
 
-              {/* Confirm Password */}
-              <View className="relative w-full mb-6">
+              {/* Confirm Password Input */}
+              <View className="relative w-full mb-4">
                 <TextInput
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
+                  onFocus={() => setFocusedField("Confirm Password")}
+                  onBlur={() => setFocusedField(null)}
                   className={`w-full p-5 rounded-md ${
+                    focusedField === "Confirm Password"
+                      ? "border-2 border-green-500"
+                      : "border border-gray-400" // Gray border when not focused
+                  } ${
                     systemTheme === "dark"
-                      ? "bg-custom-input-dark text-custom-dark"
-                      : "bg-custom-input-light text-custom-light"
+                      ? "bg-custom-input-dark text-custom-light"
+                      : "bg-custom-input-light text-custom-dark"
                   }`}
                   placeholder="Confirm Password"
                   secureTextEntry={!confirmPasswordVisible}
                   placeholderTextColor="#C7C7CD"
                 />
-                <TouchableOpacity
-                  onPress={toggleConfirmPasswordVisibility}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2"
-                >
-                  <MaterialIcons
-                    name={
-                      confirmPasswordVisible ? "visibility" : "visibility-off"
-                    }
-                    size={24}
-                    color={systemTheme === "dark" ? "#fff" : "#000"}
-                  />
-                </TouchableOpacity>
+                {confirmPassword.length > 0 && ( // Only show eye icon when data is entered
+                  <TouchableOpacity
+                    onPress={toggleConfirmPasswordVisibility}
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2"
+                  >
+                    <MaterialIcons
+                      name={confirmPasswordVisible ? "visibility" : "visibility-off"}
+                      size={24}
+                      color={systemTheme === "dark" ? "#fff" : "#000"}
+                    />
+                  </TouchableOpacity>
+                )}
               </View>
 
               {/* Sign Up Button */}
@@ -302,14 +271,17 @@ const SignUp = () => {
               <Text
                 className={`${
                   systemTheme === "dark"
-                    ? "text-custom-dark"
-                    : "text-custom-light"
+                    ? "text-custom-light"
+                    : "text-custom-dark"
                 }`}
               >
                 Already have an account?{" "}
-                {/* Using router.push() instead of Link */}
-                <Text onPress={() => router.back()} className="text-custom-green mt-5">Sign In</Text>{" "}
-                {/* Text component added here */}
+                <Text
+                  onPress={() => router.back()}
+                  className="text-custom-green"
+                >
+                  Sign In
+                </Text>
               </Text>
             </View>
           </ScrollView>
