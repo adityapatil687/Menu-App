@@ -1,6 +1,17 @@
 import iconsWhite from "./icons-white";
 
-let data = [
+let userData = 
+  {
+    userId: "1908djfvjsbv987",
+    userName: "Aditya Patil",
+    userEmail: "adityapatil687@gmail.com",
+    userResturantName: "Manan Foods",
+    userProfile: "",
+    
+  }
+
+
+let menuData = [
   {
     id: "starters", // Unique key for category
     category: "Starters",
@@ -139,4 +150,4 @@ let data = [
   }
 ];
 
-export default data;
+export default {menuData, userData};

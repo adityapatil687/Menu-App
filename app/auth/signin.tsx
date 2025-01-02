@@ -31,7 +31,7 @@ const SignIn = () => {
   const handleSignIn = () => {
     if (!email || !password) {
       // alert("Please enter both email and password.");
-      router.replace("/Home");
+      router.replace("/home/Home");
       return;
     }
     setLoading(true);
@@ -39,7 +39,7 @@ const SignIn = () => {
       setLoading(false);
     }, 2000);
     if (loading === false) {
-      router.replace("/Home");
+      router.replace("/home/Home");
     }
   };
 

@@ -1,7 +1,7 @@
 import { Text, View } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
-import Home from "./Home";
+import Home from "./home/Home";
 import Boarding from "./boarding/boarding";
 import React from "react";
 export default function Index() {
