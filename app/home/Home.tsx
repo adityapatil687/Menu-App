@@ -22,7 +22,7 @@ const Home = () => {
   const [searchQuery, setSearchQuery] = useState(""); // State for search query
   const [sortOption, setSortOption] = useState("default"); // 'default', 'price-asc', 'price-desc'
   const [vegFilter, setVegFilter] = useState("all"); // 'all', 'veg', 'non-veg'
-  const router = useRouter()
+  const router = useRouter();
 
   const getBackgroundColor = (isActive: boolean) => {
     if (isActive) {
@@ -84,13 +84,13 @@ const Home = () => {
         ]}
       >
         <View className="flex-row items-center">
-          {dish.image ? (
+          {/* {dish.image ? (
             <Image source={dish.image} className="w-16 h-16 rounded-md mr-4" />
           ) : (
             <View className="w-16 h-16 bg-black rounded-md justify-center items-center mr-4">
               <Text className="text-white">No Image</Text>
             </View>
-          )}
+          )} */}
           <View className="flex-1">
             <Text
               className={`font-bold text-lg ${
@@ -145,13 +145,22 @@ const Home = () => {
         return true;
       })
       ?.sort((a, b) => {
-        if (sortOption === "price-asc")
-          return parseFloat(a.price) - parseFloat(b.price);
-        if (sortOption === "price-desc")
-          return parseFloat(b.price) - parseFloat(a.price);
+        // Remove currency symbols (if present) and parse the price as a float
+        const parsePrice = (price: string) => {
+          return parseFloat(price.replace(/[^0-9.-]+/g, "")); // Remove non-numeric characters except for "." and "-"
+        };
+
+        const priceA = parsePrice(a.price);
+        const priceB = parsePrice(b.price);
+
+        if (sortOption === "price-asc") {
+          return priceA - priceB;
+        }
+        if (sortOption === "price-desc") {
+          return priceB - priceA;
+        }
         return 0;
       }) || [];
-
   return (
     <SafeAreaView
       className={`flex-1 ${
@@ -161,7 +170,6 @@ const Home = () => {
       <ScrollView>
         {/* Profile Section */}
         <View className="mx-5 mt-5 flex-row items-center mb-10">
-          
           <Image
             source={
               data.userData.userProfile
@@ -184,7 +192,9 @@ const Home = () => {
               {data.userData.userResturantName}
             </Text>
           </View>
-          <TouchableOpacity onPress={()=>router.push("/configuration/configuration")}>
+          <TouchableOpacity
+            onPress={() => router.push("/configuration/configuration")}
+          >
             <View
               className={`ml-auto rounded-full p-3 ${
                 systemTheme === "dark" ? "bg-green-500" : "bg-green-400"
@@ -311,7 +321,7 @@ const Home = () => {
               }`}
               onPress={() => setSortOption("price-asc")}
             >
-              <Text className="text-white">Price ↑</Text>
+              <Text className="text-white">Price ↓</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -326,7 +336,7 @@ const Home = () => {
               }`}
               onPress={() => setSortOption("price-desc")}
             >
-              <Text className="text-white">Price ↓</Text>
+              <Text className="text-white">Price ↑</Text>
             </TouchableOpacity>
           </View>
 
@@ -334,8 +344,7 @@ const Home = () => {
           {filteredDishes.length === 0 ? (
             <View className="h-40 border border-2 mt-5 rounded-2xl border-gray-400 border-dashed">
               <Text className={` my-auto text-center ${getTextColor()}`}>
-                No menu available.{"\n"}Click on edit icon to customize
-                menu.
+                No menu available.{"\n"}Click on edit icon to customize menu.
               </Text>
             </View>
           ) : (
