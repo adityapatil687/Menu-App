@@ -14,7 +14,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import iconsWhite from "@/constants/icons-white";
 import data from "@/constants/data";
 import iconsColor from "@/constants/icons-color";
-import { useRouter } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
+import { MaterialIcons } from "@expo/vector-icons";
+import { DrawerActions } from "@react-navigation/native";
 
 const Home = () => {
   const systemTheme = useColorScheme(); // Detect system theme
@@ -23,6 +25,7 @@ const Home = () => {
   const [sortOption, setSortOption] = useState("default"); // 'default', 'price-asc', 'price-desc'
   const [vegFilter, setVegFilter] = useState("all"); // 'all', 'veg', 'non-veg'
   const router = useRouter();
+  const navigation = useNavigation(); // Hook to access navigation
 
   const getBackgroundColor = (isActive: boolean) => {
     if (isActive) {
@@ -170,6 +173,18 @@ const Home = () => {
       <ScrollView>
         {/* Profile Section */}
         <View className="mx-5 mt-5 flex-row items-center mb-10">
+          {/* Hamburger Icon (Material Icon) */}
+          <TouchableOpacity
+            onPress={() => navigation.dispatch(DrawerActions.openDrawer())} // Open the drawer on press
+            className="mr-4"
+          >
+            <MaterialIcons
+              name="menu"
+              size={30}
+              color={systemTheme === "dark" ? "#fff" : "#000"}
+            />{" "}
+            {/* Hamburger Icon */}
+          </TouchableOpacity>
           <Image
             source={
               data.userData.userProfile
@@ -272,7 +287,7 @@ const Home = () => {
                     : "bg-green-400"
                   : systemTheme === "dark"
                   ? "bg-gray-700"
-                  : "bg-gray-300"
+                  : "bg-gray-400"
               }`}
               onPress={() => setVegFilter("all")}
             >
@@ -287,7 +302,7 @@ const Home = () => {
                     : "bg-green-400"
                   : systemTheme === "dark"
                   ? "bg-gray-700"
-                  : "bg-gray-300"
+                  : "bg-gray-400"
               }`}
               onPress={() => setVegFilter("veg")}
             >
@@ -302,7 +317,7 @@ const Home = () => {
                     : "bg-green-400"
                   : systemTheme === "dark"
                   ? "bg-gray-700"
-                  : "bg-gray-300"
+                  : "bg-gray-400"
               }`}
               onPress={() => setVegFilter("non-veg")}
             >
@@ -317,7 +332,7 @@ const Home = () => {
                     : "bg-green-400"
                   : systemTheme === "dark"
                   ? "bg-gray-700"
-                  : "bg-gray-300"
+                  : "bg-gray-400"
               }`}
               onPress={() => setSortOption("price-asc")}
             >
@@ -332,7 +347,7 @@ const Home = () => {
                     : "bg-green-400"
                   : systemTheme === "dark"
                   ? "bg-gray-700"
-                  : "bg-gray-300"
+                  : "bg-gray-400"
               }`}
               onPress={() => setSortOption("price-desc")}
             >

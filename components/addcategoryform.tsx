@@ -74,7 +74,7 @@ const AddCategoryForm = ({ closeModal }: { closeModal: () => void }) => {
           systemTheme === "dark"
             ? "border-white bg-neutral-900"
             : "border-black bg-neutral-50"
-        } justify-center items-center shadow-md self-center`}
+        } justify-center items-center  self-center`}
       >
         {categoryIcon ? (
           <Image
@@ -125,7 +125,7 @@ const AddCategoryForm = ({ closeModal }: { closeModal: () => void }) => {
           Alert.alert("Category Added", `Category: ${categoryName}`);
         }}
         className={`mt-3 py-3 rounded-md justify-center items-center ${
-          systemTheme === "dark" ? "bg-green-500" : "bg-green-400"
+          systemTheme === "dark" ? "bg-green-500" : "bg-green-500"
         }`}
       >
         <Text className="text-white text-xl font-bold">Add Category</Text>
@@ -135,7 +135,7 @@ const AddCategoryForm = ({ closeModal }: { closeModal: () => void }) => {
           closeModal()
         }}
         className={`mt-3 py-3 rounded-md justify-center items-center ${
-          systemTheme === "dark" ? "bg-red-500" : "bg-red-400"
+          systemTheme === "dark" ? "bg-red-500" : "bg-red-500"
         }`}
       >
         <Text className="text-white text-xl font-bold">Close</Text>

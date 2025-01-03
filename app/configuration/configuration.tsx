@@ -67,7 +67,7 @@ const Configuration = () => {
           {/* Trash Icon positioned on top-right */}
           <TouchableOpacity
             onPress={() => console.log(`${item.category} removed!`)} // Handle category removal
-            className="absolute top-0 right-0 w-6 h-6 flex justify-center items-center bg-red-600 rounded-full"
+            className="absolute top-0 right-0 w-6 h-6 flex justify-center items-center bg-red-500 rounded-full"
           >
             <Text className="text-white font-bold text-sm">X</Text>
           </TouchableOpacity>
@@ -144,7 +144,7 @@ const Configuration = () => {
           </TouchableOpacity>
           <TouchableOpacity
             className={`w-10 h-10 rounded-full justify-center items-center ${
-              systemTheme === "dark" ? "bg-red-500" : "bg-green-400"
+              systemTheme === "dark" ? "bg-red-500" : "bg-red-500"
             }`}
             onPress={() =>
               console.log(`${dish.name} removed from ${dish.category}!`)
@@ -338,7 +338,7 @@ const Configuration = () => {
                       : "bg-green-400"
                     : systemTheme === "dark"
                     ? "bg-gray-700"
-                    : "bg-gray-300"
+                    : "bg-gray-400"
                 }`}
                 onPress={() => setVegFilter("all")}
               >
@@ -353,7 +353,7 @@ const Configuration = () => {
                       : "bg-green-400"
                     : systemTheme === "dark"
                     ? "bg-gray-700"
-                    : "bg-gray-300"
+                    : "bg-gray-400"
                 }`}
                 onPress={() => setVegFilter("veg")}
               >
@@ -368,7 +368,7 @@ const Configuration = () => {
                       : "bg-green-400"
                     : systemTheme === "dark"
                     ? "bg-gray-700"
-                    : "bg-gray-300"
+                    : "bg-gray-400"
                 }`}
                 onPress={() => setVegFilter("non-veg")}
               >
@@ -383,7 +383,7 @@ const Configuration = () => {
                       : "bg-green-400"
                     : systemTheme === "dark"
                     ? "bg-gray-700"
-                    : "bg-gray-300"
+                    : "bg-gray-400"
                 }`}
                 onPress={() => setSortOption("price-asc")}
               >
@@ -398,7 +398,7 @@ const Configuration = () => {
                       : "bg-green-400"
                     : systemTheme === "dark"
                     ? "bg-gray-700"
-                    : "bg-gray-300"
+                    : "bg-gray-400"
                 }`}
                 onPress={() => setSortOption("price-desc")}
               >
