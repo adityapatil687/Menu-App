@@ -10,6 +10,7 @@ import {
 import { useColorScheme } from "react-native"; // Detect system theme
 import * as ImagePicker from "expo-image-picker"; // Image picker for icon
 import * as FileSystem from "expo-file-system"; // To check image size
+import data from "@/constants/data";
 
 const AddCategoryForm = ({ closeModal }: { closeModal: () => void }) => {
   const systemTheme = useColorScheme(); // Get system theme (dark or light)
@@ -59,32 +60,48 @@ const AddCategoryForm = ({ closeModal }: { closeModal: () => void }) => {
     }
   };
 
+  // Function to handle adding a new category
+  const handleAddCategory = () => {
+    if (!categoryName || !categoryIcon) {
+      Alert.alert(
+        "Missing Information",
+        "Please provide a category name and an icon."
+      );
+      return;
+    }
+
+    const newCategory = {
+      id: categoryName.toLowerCase().replace(/\s+/g, "_"), // Generate unique ID
+      category: categoryName,
+      icon: categoryIcon, // Use selected icon URI
+      dishes: [], // Start with an empty dishes array
+    };
+
+    // Add the new category to menuData
+    data.menuData.push(newCategory);
+
+    // Notify user and close modal
+    Alert.alert("Category Added", `Category: ${categoryName}`);
+    closeModal();
+  };
+
   return (
     <View
-      className={`w-full px-6 py-8 rounded-lg border shadow-md ${
-        systemTheme === "dark"
-          ? "bg-neutral-800 border-gray-700"
-          : "bg-neutral-50 border-gray-400"
+      className={`w-full px-6 py-8 rounded-lg shadow-md ${
+        systemTheme === "dark" ? "bg-neutral-800" : "bg-neutral-50"
       }`}
     >
       {/* Category Icon Upload (Top) */}
       <TouchableOpacity
         onPress={handleImagePick}
-        className={`w-30 h-30 p-10 rounded-full border-2 ${
-          systemTheme === "dark"
-            ? "border-white bg-neutral-900"
-            : "border-black bg-neutral-50"
-        } justify-center items-center  self-center`}
+        className={`w-40 h-40 bg-green-500 rounded-full justify-center items-center self-center`}
       >
         {categoryIcon ? (
-          <Image
-            source={{ uri: categoryIcon }}
-            className="w-30 h-30 rounded-xl"
-          />
+          <Image source={{ uri: categoryIcon }} className="w-20 h-20" />
         ) : (
           <Text
             className={`${
-              systemTheme === "dark" ? "text-white" : "text-black"
+              systemTheme === "dark" ? "text-white" : "text-white"
             } text-center text-lg font-medium`}
           >
             Upload{"\n"}Icon
@@ -103,7 +120,7 @@ const AddCategoryForm = ({ closeModal }: { closeModal: () => void }) => {
         className={`w-full p-5 rounded-md mt-7 ${
           focusedField === "categoryName"
             ? "border-2 border-green-500"
-            : "border border-gray-400" // Gray border when not focused
+            : "border border-gray-400"
         } ${
           systemTheme === "dark"
             ? "bg-custom-input-dark text-custom-light"
@@ -113,30 +130,15 @@ const AddCategoryForm = ({ closeModal }: { closeModal: () => void }) => {
 
       {/* Submit Button */}
       <TouchableOpacity
-        onPress={() => {
-          if (!categoryName || !categoryIcon) {
-            Alert.alert(
-              "Missing Information",
-              "Please provide a category name and an icon."
-            );
-            return;
-          }
-          // Proceed to submit the form (e.g., save category)
-          Alert.alert("Category Added", `Category: ${categoryName}`);
-        }}
-        className={`mt-3 py-3 rounded-md justify-center items-center ${
-          systemTheme === "dark" ? "bg-green-500" : "bg-green-500"
-        }`}
+        onPress={handleAddCategory}
+        className={`mt-3 py-3 rounded-md justify-center items-center bg-green-500`}
       >
         <Text className="text-white text-xl font-bold">Add Category</Text>
       </TouchableOpacity>
+
       <TouchableOpacity
-        onPress={() => {
-          closeModal()
-        }}
-        className={`mt-3 py-3 rounded-md justify-center items-center ${
-          systemTheme === "dark" ? "bg-red-500" : "bg-red-500"
-        }`}
+        onPress={closeModal}
+        className={`mt-3 py-3 rounded-md justify-center items-center bg-red-500`}
       >
         <Text className="text-white text-xl font-bold">Close</Text>
       </TouchableOpacity>
@@ -145,3 +147,4 @@ const AddCategoryForm = ({ closeModal }: { closeModal: () => void }) => {
 };
 
 export default AddCategoryForm;
+

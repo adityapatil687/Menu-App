@@ -175,15 +175,16 @@ const Home = () => {
         <View className="mx-5 mt-5 flex-row items-center mb-10">
           {/* Hamburger Icon (Material Icon) */}
           <TouchableOpacity
-            onPress={() => navigation.dispatch(DrawerActions.openDrawer())} // Open the drawer on press
+            onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
             className="mr-4"
           >
-            <MaterialIcons
-              name="menu"
-              size={30}
-              color={systemTheme === "dark" ? "#fff" : "#000"}
-            />{" "}
-            {/* Hamburger Icon */}
+            <Text>
+              <MaterialIcons
+                name="menu"
+                size={30}
+                color={systemTheme === "dark" ? "#fff" : "#000"}
+              />
+            </Text>
           </TouchableOpacity>
           <Image
             source={
