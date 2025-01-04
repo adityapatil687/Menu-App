@@ -1,12 +1,12 @@
 import { View, Text } from "react-native";
 import React from "react";
 
-const Sales = () => {
+const Cart = () => {
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Sales</Text>
+      <Text>Cart</Text>
     </View>
   );
 };
 
-export default Sales;
+export default Cart;

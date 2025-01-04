@@ -20,6 +20,7 @@ import iconsColor from "@/constants/icons-color";
 import { useRouter } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import AddCategoryForm from "@/components/addcategoryform";
+
 const Configuration = () => {
   const systemTheme = useColorScheme(); // Detect system theme
   const [selectedCategoryIndex, setSelectedCategoryIndex] = useState(0); // State to track selected category
@@ -86,7 +87,7 @@ const Configuration = () => {
 
   const renderDishCard = (dish: {
     name: string;
-    price: string;
+    price: number;
     isVeg: boolean;
     image?: any;
     id: string;
@@ -127,7 +128,7 @@ const Configuration = () => {
               numberOfLines={1}
               ellipsizeMode="tail"
             >
-              {dish.price}
+              ₹ {dish.price}
             </Text>
           </View>
           {/* "+" Button */}
@@ -169,33 +170,25 @@ const Configuration = () => {
   }
   // Filter dishes based on search query, category, veg filter, and sort option
   const filteredDishes =
-    data.menuData[selectedCategoryIndex]?.dishes
-      ?.filter((dish) =>
-        dish.name.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-      ?.filter((dish) => {
-        if (vegFilter === "veg") return dish.isVeg;
-        if (vegFilter === "non-veg") return !dish.isVeg;
-        return true;
-      })
-      ?.sort((a, b) => {
-        // Remove currency symbols (if present) and parse the price as a float
-        const parsePrice = (price: string) => {
-          return parseFloat(price.replace(/[^0-9.-]+/g, "")); // Remove non-numeric characters except for "." and "-"
-        };
-
-        const priceA = parsePrice(a.price);
-        const priceB = parsePrice(b.price);
-
-        if (sortOption === "price-asc") {
-          return priceA - priceB;
-        }
-        if (sortOption === "price-desc") {
-          return priceB - priceA;
-        }
-        return 0;
-      }) || [];
-  return (
+  data.menuData[selectedCategoryIndex]?.dishes
+    ?.filter((dish) =>
+      dish.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    ?.filter((dish) => {
+      if (vegFilter === "veg") return dish.isVeg;
+      if (vegFilter === "non-veg") return !dish.isVeg;
+      return true;
+    })
+    ?.sort((a, b) => {
+      if (sortOption === "price-asc") {
+        return a.price - b.price; // Direct numeric comparison
+      }
+      if (sortOption === "price-desc") {
+        return b.price - a.price; // Direct numeric comparison
+      }
+      return 0; // Default order
+    }) || [];
+return (
     <>
       <Modal
         animationType="slide"

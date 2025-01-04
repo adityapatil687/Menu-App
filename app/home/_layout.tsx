@@ -8,7 +8,7 @@ import {
   DrawerItem,
 } from "@react-navigation/drawer"; // For custom drawer content
 
-import Sales from "./(drawer)/sales";
+import Cart from "./(drawer)/Cart";
 import Home from "./home";
 
 // Drawer Navigator
@@ -101,8 +101,8 @@ const DrawerLayout = () => {
         }}
       />
       <Drawer.Screen
-        name="Sales"
-        component={Sales}
+        name="Cart"
+        component={Cart}
         options={{
           drawerIcon: ({ color, size }) => (
             <View
@@ -111,7 +111,7 @@ const DrawerLayout = () => {
                 { backgroundColor: iconBgColor }, // Set dynamic background color
               ]}
             >
-              <MaterialIcons name="timeline" size={size} color={iconColor} />
+              <MaterialIcons name="shopping-cart" size={size} color={iconColor} />
             </View>
           ),
         }}

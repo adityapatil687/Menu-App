@@ -72,7 +72,7 @@ const Home = () => {
 
   const renderDishCard = (dish: {
     name: string;
-    price: string;
+    price: number;
     isVeg: boolean;
     image?: any;
     id: string;
@@ -113,7 +113,7 @@ const Home = () => {
               numberOfLines={1}
               ellipsizeMode="tail"
             >
-              {dish.price}
+              ₹ {dish.price}
             </Text>
           </View>
           {/* "+" Button */}
@@ -148,22 +148,15 @@ const Home = () => {
         return true;
       })
       ?.sort((a, b) => {
-        // Remove currency symbols (if present) and parse the price as a float
-        const parsePrice = (price: string) => {
-          return parseFloat(price.replace(/[^0-9.-]+/g, "")); // Remove non-numeric characters except for "." and "-"
-        };
-
-        const priceA = parsePrice(a.price);
-        const priceB = parsePrice(b.price);
-
         if (sortOption === "price-asc") {
-          return priceA - priceB;
+          return a.price - b.price; // Direct numeric comparison
         }
         if (sortOption === "price-desc") {
-          return priceB - priceA;
+          return b.price - a.price; // Direct numeric comparison
         }
-        return 0;
+        return 0; // Default order
       }) || [];
+
   return (
     <SafeAreaView
       className={`flex-1 ${
