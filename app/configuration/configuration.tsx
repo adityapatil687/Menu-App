@@ -19,7 +19,8 @@ import data from "@/constants/data";
 import iconsColor from "@/constants/icons-color";
 import { useRouter } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
-import AddCategoryForm from "@/components/addcategoryform";
+import AddCategoryForm from "@/components/addCategoryform";
+import AddDishForm from "@/components/addDishForm";
 
 const Configuration = () => {
   const systemTheme = useColorScheme(); // Detect system theme
@@ -28,6 +29,8 @@ const Configuration = () => {
   const [sortOption, setSortOption] = useState("default"); // 'default', 'price-asc', 'price-desc'
   const [vegFilter, setVegFilter] = useState("all"); // 'all', 'veg', 'non-veg'
   const [modalVisible, setModalVisible] = useState(false);
+  const [isCategoryPressed, setIsCategoryPressed] = useState(false);
+  const [isDishPressed, setIsDishPressed] = useState(false);
   const router = useRouter();
 
   const getBackgroundColor = (isActive: boolean) => {
@@ -164,40 +167,34 @@ const Configuration = () => {
     );
   };
 
-  const closeModal = () =>
-  {
-    setModalVisible(!modalVisible)
-  }
+  const closeModal = () => {
+    setModalVisible(!modalVisible);
+    setIsCategoryPressed(false);
+    setIsDishPressed(false);
+  };
   // Filter dishes based on search query, category, veg filter, and sort option
   const filteredDishes =
-  data.menuData[selectedCategoryIndex]?.dishes
-    ?.filter((dish) =>
-      dish.name.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-    ?.filter((dish) => {
-      if (vegFilter === "veg") return dish.isVeg;
-      if (vegFilter === "non-veg") return !dish.isVeg;
-      return true;
-    })
-    ?.sort((a, b) => {
-      if (sortOption === "price-asc") {
-        return a.price - b.price; // Direct numeric comparison
-      }
-      if (sortOption === "price-desc") {
-        return b.price - a.price; // Direct numeric comparison
-      }
-      return 0; // Default order
-    }) || [];
-return (
+    data.menuData[selectedCategoryIndex]?.dishes
+      ?.filter((dish) =>
+        dish.name.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+      ?.filter((dish) => {
+        if (vegFilter === "veg") return dish.isVeg;
+        if (vegFilter === "non-veg") return !dish.isVeg;
+        return true;
+      })
+      ?.sort((a, b) => {
+        if (sortOption === "price-asc") {
+          return a.price - b.price; // Direct numeric comparison
+        }
+        if (sortOption === "price-desc") {
+          return b.price - a.price; // Direct numeric comparison
+        }
+        return 0; // Default order
+      }) || [];
+  return (
     <>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(!modalVisible);
-        }}
-      >
+      <Modal animationType="slide" transparent={true} visible={modalVisible}>
         <TouchableWithoutFeedback
           onPress={() => {
             Keyboard.dismiss(); // Dismiss the keyboar
@@ -205,7 +202,16 @@ return (
         >
           <View className="my-auto">
             <View className="p-5 rounded-lg">
-              <AddCategoryForm closeModal={closeModal} />
+              {
+                isCategoryPressed == true?
+                (
+                  <AddCategoryForm closeModal={closeModal} />
+                ):
+                (
+                  <AddDishForm closeModal={closeModal} activeCategory={data.menuData[selectedCategoryIndex]?.category} />
+                )
+              }
+              
             </View>
           </View>
         </TouchableWithoutFeedback>
@@ -260,6 +266,7 @@ return (
                 }`}
                 onPress={() => {
                   console.log("Add category pressed");
+                  setIsCategoryPressed(true)
                   setModalVisible(true);
                 }}
               >
@@ -281,6 +288,8 @@ return (
                   systemTheme === "dark" ? "border-gray-50" : "border-gray-950"
                 }`}
                 onPress={() => {
+                  setIsDishPressed(true)
+                  setModalVisible(true);
                   console.log("Add category pressed");
                 }}
               >
