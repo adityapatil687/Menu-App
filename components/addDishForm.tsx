@@ -1,77 +1,96 @@
-import React, { useState } from "react";
-import { TextInput, View, Text, TouchableOpacity, Alert, Switch } from "react-native";
-import { useColorScheme } from "react-native"; // Detect system theme
+import React, { useEffect, useState } from "react";
+import {
+  TextInput,
+  View,
+  Text,
+  TouchableOpacity,
+  Alert,
+  Switch,
+} from "react-native";
+import { useColorScheme } from "react-native";
 import data from "@/constants/data";
 
 const AddDishForm = ({
   closeModal,
   activeCategory,
+  isEditDishPressed,
+  editDishData,
 }: {
   closeModal: () => void;
   activeCategory: string;
+  isEditDishPressed?: boolean;
+  editDishData?: {id: string, name: string; price: number; isVeg: boolean }; // Pass dish data when editing
 }) => {
   const systemTheme = useColorScheme(); // Get system theme (dark or light)
   const [dishName, setDishName] = useState(""); // State for dish name
-  const [dishPrice, setDishPrice] = useState(""); // State for dish price
+  const [dishPrice, setDishPrice] = useState<number>(0); // State for dish price (number)
   const [isVeg, setIsVeg] = useState<boolean>(true); // State for dish type (Veg or Non-Veg)
   const [focusedField, setFocusedField] = useState<string | null>(null); // State for tracking the focused field
 
-  // Function to handle adding a new dish
-  const handleAddDish = () => {
-    if (!dishName || !dishPrice) {
-      Alert.alert(
-        "Missing Information",
-        "Please provide a dish name and price."
-      );
-      return;
+  // Populate form fields if editing
+  useEffect(() => {
+    if (isEditDishPressed && editDishData) {
+      setDishName(editDishData.name);
+      setDishPrice(editDishData.price);
+      setIsVeg(editDishData.isVeg);
     }
+  }, [isEditDishPressed, editDishData]);
 
-    const priceValue = parseFloat(dishPrice);
-    if (isNaN(priceValue) || priceValue <= 0) {
-      Alert.alert(
-        "Invalid Price",
-        "Please enter a valid price greater than 0."
-      );
+  // Function to handle adding or editing a dish
+  const handleAddOrEditDish = () => {
+    if (!dishName || dishPrice <= 0) {
+      Alert.alert("Missing Information", "Please provide a dish name and a valid price.");
       return;
     }
 
     const newDish = {
       id: dishName.toLowerCase().replace(/\s+/g, "_"), // Generate unique ID
       name: dishName,
-      price: priceValue, // Dish price
+      price: dishPrice, // Dish price
       isVeg, // Use the value from the Switch (true for Veg, false for Non-Veg)
     };
 
-    // Find the active category based on its name
     const categoryIndex = data.menuData.findIndex(
       (category) => category.category === activeCategory
-    ); // Use activeCategory instead of a hardcoded ID
+    );
 
     if (categoryIndex !== -1) {
-      // Add the new dish to the dishes array of the active category
-      data.menuData[categoryIndex].dishes.push(newDish);
+      if (isEditDishPressed) {
+        // Edit existing dish
+        const dishIndex = data.menuData[categoryIndex].dishes.findIndex(
+          (dish) => dish.name === editDishData?.name
+        );
+
+        if (dishIndex !== -1) {
+          data.menuData[categoryIndex].dishes[dishIndex] = newDish;
+          Alert.alert("Dish Updated", `Dish: ${dishName} updated successfully.`);
+        } else {
+          Alert.alert("Dish Not Found", "Dish to edit was not found.");
+          return;
+        }
+      } else {
+        // Add new dish
+        data.menuData[categoryIndex].dishes.push(newDish);
+        Alert.alert("Dish Added", `Dish: ${dishName} for ₹${dishPrice}`);
+      }
     } else {
       Alert.alert("Category Not Found", "Please select a valid category.");
       return;
     }
 
-    // Notify user and close modal
-    Alert.alert("Dish Added", `Dish: ${dishName} for ₹${dishPrice}`);
     closeModal();
   };
 
   return (
     <View
-      className={`w-full px-6 py-8 rounded-lg shadow-md ${
-        systemTheme === "dark" ? "bg-neutral-800" : "bg-neutral-50"
-      }`}
+      className={`w-full px-6 py-8 rounded-lg shadow-md ${systemTheme === "dark" ? "bg-neutral-800" : "bg-neutral-50"}`}
     >
       {/* Dish Name Input */}
       <TextInput
         value={dishName}
         onChangeText={setDishName}
         placeholder="Enter dish name"
-        placeholderTextColor="#C7C7CD" // Placeholder color
+        placeholderTextColor="#C7C7CD"
         onFocus={() => setFocusedField("dishName")}
         onBlur={() => setFocusedField(null)}
         className={`w-full p-5 rounded-md mt-7 ${
@@ -87,11 +106,11 @@ const AddDishForm = ({
 
       {/* Dish Price Input */}
       <TextInput
-        value={dishPrice}
-        onChangeText={setDishPrice}
+        value={dishPrice.toString()}
+        onChangeText={(text) => setDishPrice(Number(text))}
         placeholder="Enter dish price"
-        placeholderTextColor="#C7C7CD" // Placeholder color
-        keyboardType="numeric" // For numeric input
+        placeholderTextColor="#C7C7CD"
+        keyboardType="numeric"
         onFocus={() => setFocusedField("dishPrice")}
         onBlur={() => setFocusedField(null)}
         className={`w-full p-5 rounded-md mt-7 ${
@@ -120,10 +139,12 @@ const AddDishForm = ({
 
       {/* Submit Button */}
       <TouchableOpacity
-        onPress={handleAddDish}
+        onPress={handleAddOrEditDish}
         className={`mt-3 py-3 rounded-md justify-center items-center bg-green-500`}
       >
-        <Text className="text-white text-xl font-bold">Add Dish</Text>
+        <Text className="text-white text-xl font-bold">
+          {isEditDishPressed ? "Update Dish" : "Add Dish"}
+        </Text>
       </TouchableOpacity>
 
       {/* Close Button */}

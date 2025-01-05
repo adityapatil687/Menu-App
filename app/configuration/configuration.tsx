@@ -24,14 +24,42 @@ import AddDishForm from "@/components/addDishForm";
 
 const Configuration = () => {
   const systemTheme = useColorScheme(); // Detect system theme
+  const [menuData, setMenuData] = useState(data.menuData);
   const [selectedCategoryIndex, setSelectedCategoryIndex] = useState(0); // State to track selected category
   const [searchQuery, setSearchQuery] = useState(""); // State for search query
   const [sortOption, setSortOption] = useState("default"); // 'default', 'price-asc', 'price-desc'
   const [vegFilter, setVegFilter] = useState("all"); // 'all', 'veg', 'non-veg'
   const [modalVisible, setModalVisible] = useState(false);
   const [isCategoryPressed, setIsCategoryPressed] = useState(false);
-  const [isDishPressed, setIsDishPressed] = useState(false);
+  const [isAddDishPressed, setIsAddDishPressed] = useState(false);
+  const [isEditDishPressed, setIsEditDishPressed] = useState(false);
+  const [editDishData, setEditDishData] = useState<{
+    id: string;
+    name: string;
+    price: number;
+    isVeg: boolean;
+  }>({
+    id: "",
+    name: "",
+    price: 0,
+    isVeg: true,
+  });
+
   const router = useRouter();
+
+  const handleDeleteCategory = (categoryIndex: number) => {
+    // Remove category from the data by filtering out the selected category
+    const updatedMenuData = [...data.menuData];
+    updatedMenuData.splice(categoryIndex, 1);
+    data.menuData = updatedMenuData; // Update the data menu
+
+    // Reset selected category index if it's deleted
+    if (selectedCategoryIndex === categoryIndex) {
+      setSelectedCategoryIndex(0);
+    }
+  };
+
+  const handleDeleteDish = () => {};
 
   const getBackgroundColor = (isActive: boolean) => {
     if (isActive) {
@@ -70,7 +98,10 @@ const Configuration = () => {
 
           {/* Trash Icon positioned on top-right */}
           <TouchableOpacity
-            onPress={() => console.log(`${item.category} removed!`)} // Handle category removal
+            onPress={() => {
+              handleDeleteCategory(index);
+              console.log(`${item.category} removed!`);
+            }} // Handle category removal
             className="absolute top-0 right-0 w-6 h-6 flex justify-center items-center bg-red-500 rounded-full"
           >
             <Text className="text-white font-bold text-sm">X</Text>
@@ -140,9 +171,17 @@ const Configuration = () => {
             className={`w-10 h-10 rounded-full me-2 justify-center items-center ${
               systemTheme === "dark" ? "bg-green-500" : "bg-green-400"
             }`}
-            onPress={() =>
-              console.log(`Model should be opened to edit data of dish`)
-            }
+            onPress={() => {
+              setEditDishData({
+                id: dish.id,
+                name: dish.name,
+                price: dish.price,
+                isVeg: dish.isVeg,
+              });
+              setModalVisible(true);
+              setIsEditDishPressed(true);
+              console.log(isEditDishPressed);
+            }}
           >
             <Image source={iconsWhite.edit} className="w-4 h-4" />
           </TouchableOpacity>
@@ -150,9 +189,10 @@ const Configuration = () => {
             className={`w-10 h-10 rounded-full justify-center items-center ${
               systemTheme === "dark" ? "bg-red-500" : "bg-red-500"
             }`}
-            onPress={() =>
-              console.log(`${dish.name} removed from ${dish.category}!`)
-            }
+            onPress={() => {
+              handleDeleteDish;
+              console.log(`${dish.name} removed from ${dish.category}!`);
+            }}
           >
             <Text
               className={`text-white text-lg font-bold ${
@@ -170,7 +210,8 @@ const Configuration = () => {
   const closeModal = () => {
     setModalVisible(!modalVisible);
     setIsCategoryPressed(false);
-    setIsDishPressed(false);
+    setIsAddDishPressed(false);
+    setIsEditDishPressed(false);
   };
   // Filter dishes based on search query, category, veg filter, and sort option
   const filteredDishes =
@@ -194,28 +235,81 @@ const Configuration = () => {
       }) || [];
   return (
     <>
-      <Modal animationType="slide" transparent={true} visible={modalVisible}>
-        <TouchableWithoutFeedback
-          onPress={() => {
-            Keyboard.dismiss(); // Dismiss the keyboar
-          }}
-        >
-          <View className="my-auto">
-            <View className="p-5 rounded-lg">
-              {
-                isCategoryPressed == true?
-                (
+      {isCategoryPressed == true && (
+        <>
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+          >
+            <TouchableWithoutFeedback
+              onPress={() => {
+                Keyboard.dismiss(); // Dismiss the keyboar
+              }}
+            >
+              <View className="my-auto">
+                <View className="p-5 rounded-lg">
                   <AddCategoryForm closeModal={closeModal} />
-                ):
-                (
-                  <AddDishForm closeModal={closeModal} activeCategory={data.menuData[selectedCategoryIndex]?.category} />
-                )
-              }
-              
-            </View>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </Modal>
+        </>
+      )}
+      {isAddDishPressed == true && (
+        <>
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+          >
+            <TouchableWithoutFeedback
+              onPress={() => {
+                Keyboard.dismiss(); // Dismiss the keyboar
+              }}
+            >
+              <View className="my-auto">
+                <View className="p-5 rounded-lg">
+                  <AddDishForm
+                    closeModal={closeModal}
+                    activeCategory={
+                      data.menuData[selectedCategoryIndex]?.category
+                    }
+                  />
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </Modal>
+        </>
+      )}
+      {isEditDishPressed == true && (
+        <>
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+          >
+            <TouchableWithoutFeedback
+              onPress={() => {
+                Keyboard.dismiss(); // Dismiss the keyboar
+              }}
+            >
+              <View className="my-auto">
+                <View className="p-5 rounded-lg">
+                  <AddDishForm
+                    closeModal={closeModal}
+                    activeCategory={
+                      data.menuData[selectedCategoryIndex]?.category
+                    }
+                    isEditDishPressed={isEditDishPressed}
+                    editDishData={editDishData}
+                  />
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </Modal>
+        </>
+      )}
 
       <SafeAreaView
         className={`flex-1 ${
@@ -266,7 +360,7 @@ const Configuration = () => {
                 }`}
                 onPress={() => {
                   console.log("Add category pressed");
-                  setIsCategoryPressed(true)
+                  setIsCategoryPressed(true);
                   setModalVisible(true);
                 }}
               >
@@ -288,7 +382,7 @@ const Configuration = () => {
                   systemTheme === "dark" ? "border-gray-50" : "border-gray-950"
                 }`}
                 onPress={() => {
-                  setIsDishPressed(true)
+                  setIsAddDishPressed(true);
                   setModalVisible(true);
                   console.log("Add category pressed");
                 }}
