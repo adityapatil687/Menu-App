@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useState, ReactNode } from 'react';
 import iconsWhite from "@/constants/icons-white";
 
 const dummyMenuData = [
@@ -54,12 +54,26 @@ const dummyMenuData = [
   }
 ];
 
+const dummyCartData = [
+  {
+    id: "lassi",
+    name: "Lassi",
+    price: 80,
+    isVeg: true,
+    quantity: 2
+  },
+];
+
 export const GlobalContext = createContext<{
   menuData: MenuCategory[];
   setMenuData: (data: MenuCategory[]) => void;
+  cartData: CartItem[];
+  setCartData: (data: CartItem[]) => void;
 }>({
   menuData: [],
-  setMenuData: () => {}
+  setMenuData: () => {},
+  cartData: [],
+  setCartData: () => {}
 });
 
 type Dish = {
@@ -73,14 +87,24 @@ type MenuCategory = {
   id: string;
   category: string;
   icon: any;
+  isIconUploaded: boolean;
   dishes: Dish[];
+};
+
+type CartItem = {
+  id: string;
+  name: string;
+  price: number;
+  isVeg: boolean;
+  quantity: number;
 };
 
 export const GlobalProvider = ({ children }: { children: ReactNode }) => {
   const [menuData, setMenuData] = useState<MenuCategory[]>(dummyMenuData);
+  const [cartData, setCartData] = useState<CartItem[]>(dummyCartData);
 
   return (
-    <GlobalContext.Provider value={{ menuData, setMenuData }}>
+    <GlobalContext.Provider value={{ menuData, setMenuData, cartData, setCartData }}>
       {children}
     </GlobalContext.Provider>
   );
