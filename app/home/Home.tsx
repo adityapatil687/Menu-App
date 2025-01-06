@@ -23,7 +23,7 @@ const Home = () => {
   const [searchQuery, setSearchQuery] = useState(""); // State for search query
   const [sortOption, setSortOption] = useState("default"); // 'default', 'price-asc', 'price-desc'
   const [vegFilter, setVegFilter] = useState("all"); // 'all', 'veg', 'non-veg'
-  const { menuData, setMenuData } = useContext(GlobalContext);
+  const { menuData, setMenuData, cartData, setCartData } = useContext(GlobalContext);
   const router = useRouter();
   const navigation = useNavigation(); // Hook to access navigation
 
@@ -84,6 +84,19 @@ const Home = () => {
   }) => {
     const styles = getDishCardStyles();
 
+    function handleAddToCart(dish: { name: string; price: number; isVeg: boolean; image?: any; id: string; }) {
+      const existingCartItem = cartData.find((item) => item.id === dish.id);
+      if (existingCartItem) {
+        setCartData(
+          cartData.map((item) =>
+            item.id === dish.id ? { ...item, quantity: item.quantity + 1 } : item
+          )
+        );
+      } else {
+        setCartData([...cartData, { ...dish, quantity: 1 }]);
+      }
+    }
+
     return (
       <View
         style={[
@@ -126,7 +139,10 @@ const Home = () => {
             className={`w-10 h-10 rounded-full justify-center items-center ${
               systemTheme === "dark" ? "bg-green-500" : "bg-green-400"
             }`}
-            onPress={() => console.log(`${dish.name} added to cart!`)}
+            onPress={() => {
+              handleAddToCart(dish);
+            }
+            }
           >
             <Text
               className={`text-white text-lg font-bold ${

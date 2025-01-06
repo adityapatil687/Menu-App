@@ -158,7 +158,14 @@ let cartData = [
     price: 80,
     isVeg: true,
     quantity: 2
-  }
+  },
+  {
+    id: "paneer_tikka",
+    name: "Paneer Tikka",
+    price: 120,
+    isVeg: true,
+    quantity: 1
+  },
 ]
 
 export default {menuData, userData};
