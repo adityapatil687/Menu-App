@@ -1,50 +1,101 @@
-# Welcome to your Expo app 👋
+![Menu app](https://github.com/user-attachments/assets/31b31f74-8536-44c1-96d6-81e156f55d44)
+# Menu App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Welcome to the **Menu App**! This application allows users to customize a menu, generate invoices for selected items, and filter or sort the menu based on various criteria. It's designed to be flexible and easy to use, making it perfect for restaurants, cafes, or any food service business.
 
-## Get started
+## Features
 
-1. Install dependencies
+- **Customizable Menu**: Add, edit, and remove items from the menu.
+- **Invoice Generation**: Automatically generate invoices for selected menu items.
+- **Filtering and Sorting**: Filter and sort menu items based on categories, price, popularity, and more.
+- **Responsive Design**: Works seamlessly across devices.
+
+## Installation
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/yourusername/menu-app.git
+   ```
+
+2. Navigate to the project directory:
+
+   ```bash
+   cd menu-app
+   ```
+
+3. Install dependencies:
 
    ```bash
    npm install
    ```
 
-2. Start the app
+4. Start the application:
 
    ```bash
-    npx expo start
+   npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+## Usage
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+1. Launch the app on your device or emulator:
+   - Use the Expo Go app to scan the QR code displayed in the terminal.
+   - Or launch the app directly in an emulator.
+2. Use the menu interface to:
+   - Add new items to the menu by specifying name, price, category
+   - Edit or delete existing menu items.
+   - Apply filters or sorting to view items based on your preferences.
+   - Select items and generate an invoice.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
-## Get a fresh project
+## Technologies Used
 
-When you're ready, run:
+- **Frontend**: React Native, Expo, TypeScript, AynscStorage
 
-```bash
-npm run reset-project
-```
+## Roadmap
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+- [ ] Add user authentication for admin and customer roles.
+- [ ] Implement multi-language support.
+- [ ] Enhance filtering with advanced options (e.g., dietary preferences).
+- [ ] Add export functionality for invoices (PDF/CSV).
+- [ ] Enable online payments through integrations.
 
-## Learn more
+## Contributing
 
-To learn more about developing your project with Expo, look at the following resources:
+Contributions are welcome! Please follow these steps:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+1. Fork the repository.
+2. Create a new branch:
 
-## Join the community
+   ```bash
+   git checkout -b feature-name
+   ```
 
-Join our community of developers creating universal apps.
+3. Commit your changes:
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+   ```bash
+   git commit -m "Add a new feature"
+   ```
+
+4. Push to the branch:
+
+   ```bash
+   git push origin feature-name
+   ```
+
+5. Create a pull request.
+
+## License
+
+This project is licensed under the MIT License. See the `LICENSE` file for details.
+
+## Acknowledgments
+
+- Special thanks to the open-source community for providing amazing tools and libraries.
+- Inspiration for the project came from various restaurant management systems.
+
+---
+
+Happy coding! 🎉
+
+
