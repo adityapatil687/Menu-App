@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   TextInput,
   View,
@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { useColorScheme } from "react-native";
 import data from "@/constants/data";
+import { GlobalContext } from "@/context/GlobalProvider";
 
 const AddDishForm = ({
   closeModal,
@@ -26,7 +27,7 @@ const AddDishForm = ({
   const [dishPrice, setDishPrice] = useState<number>(0); // State for dish price (number)
   const [isVeg, setIsVeg] = useState<boolean>(true); // State for dish type (Veg or Non-Veg)
   const [focusedField, setFocusedField] = useState<string | null>(null); // State for tracking the focused field
-
+  const { menuData, setMenuData } = useContext(GlobalContext); // Access context value
   // Populate form fields if editing
   useEffect(() => {
     if (isEditDishPressed && editDishData) {
@@ -50,19 +51,19 @@ const AddDishForm = ({
       isVeg, // Use the value from the Switch (true for Veg, false for Non-Veg)
     };
 
-    const categoryIndex = data.menuData.findIndex(
+    const categoryIndex = menuData.findIndex(
       (category) => category.category === activeCategory
     );
 
     if (categoryIndex !== -1) {
       if (isEditDishPressed) {
         // Edit existing dish
-        const dishIndex = data.menuData[categoryIndex].dishes.findIndex(
+        const dishIndex = menuData[categoryIndex].dishes.findIndex(
           (dish) => dish.name === editDishData?.name
         );
 
         if (dishIndex !== -1) {
-          data.menuData[categoryIndex].dishes[dishIndex] = newDish;
+          menuData[categoryIndex].dishes[dishIndex] = newDish;
           Alert.alert("Dish Updated", `Dish: ${dishName} updated successfully.`);
         } else {
           Alert.alert("Dish Not Found", "Dish to edit was not found.");
@@ -70,7 +71,7 @@ const AddDishForm = ({
         }
       } else {
         // Add new dish
-        data.menuData[categoryIndex].dishes.push(newDish);
+        menuData[categoryIndex].dishes.push(newDish);
         Alert.alert("Dish Added", `Dish: ${dishName} for ₹${dishPrice}`);
       }
     } else {

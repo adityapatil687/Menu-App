@@ -1,5 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import iconsWhite from "@/constants/icons-white";
 
 const dummyMenuData = [
@@ -7,6 +6,7 @@ const dummyMenuData = [
     id: "starters",
     category: "Starters",
     icon: iconsWhite.starters,
+    isIconUploaded: false,
     dishes: [
       { id: "masala_papad", name: "Masala Papad", price: 30, isVeg: true },
       { id: "samosa", name: "Samosa", price: 40, isVeg: true },
@@ -18,6 +18,7 @@ const dummyMenuData = [
     id: "main_course",
     category: "Main Course",
     icon: iconsWhite.main_course,
+    isIconUploaded: false,
     dishes: [
       { id: "butter_paneer", name: "Butter Paneer", price: 300, isVeg: true },
       { id: "dal_makhani", name: "Dal Makhani", price: 180, isVeg: true },
@@ -30,6 +31,7 @@ const dummyMenuData = [
     id: "desserts",
     category: "Desserts",
     icon: iconsWhite.dessert,
+    isIconUploaded: false,
     dishes: [
       { id: "gulab_jamun", name: "Gulab Jamun", price: 60, isVeg: true },
       { id: "rasgulla", name: "Rasgulla", price: 50, isVeg: true },
@@ -41,6 +43,7 @@ const dummyMenuData = [
     id: "beverages",
     category: "Beverages",
     icon: iconsWhite.beverages,
+    isIconUploaded: false,
     dishes: [
       { id: "water_bottle", name: "Water Bottle", price: 20, isVeg: true },
       { id: "masala_chai", name: "Masala Chai", price: 30, isVeg: true },
@@ -59,8 +62,6 @@ export const GlobalContext = createContext<{
   setMenuData: () => {}
 });
 
-import { ReactNode } from 'react';
-
 type Dish = {
   id: string;
   name: string;
@@ -76,28 +77,10 @@ type MenuCategory = {
 };
 
 export const GlobalProvider = ({ children }: { children: ReactNode }) => {
-  const [menuData, setMenuData] = useState<MenuCategory[]>([]);
-
-  useEffect(() => {
-    const loadMenuData = async () => {
-      const storedMenuData = await AsyncStorage.getItem('menuData');
-      if (storedMenuData) {
-        setMenuData(JSON.parse(storedMenuData));
-      } else {
-        setMenuData(dummyMenuData);
-        await AsyncStorage.setItem('menuData', JSON.stringify(dummyMenuData));
-      }
-    };
-    loadMenuData();
-  }, []);
-
-  const saveMenuData = async (data: React.SetStateAction<MenuCategory[]>) => {
-    setMenuData(data);
-    await AsyncStorage.setItem('menuData', JSON.stringify(data));
-  };
+  const [menuData, setMenuData] = useState<MenuCategory[]>(dummyMenuData);
 
   return (
-    <GlobalContext.Provider value={{ menuData, setMenuData: saveMenuData }}>
+    <GlobalContext.Provider value={{ menuData, setMenuData }}>
       {children}
     </GlobalContext.Provider>
   );

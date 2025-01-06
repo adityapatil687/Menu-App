@@ -10,20 +10,20 @@ import {
   TextInput,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
+import { useContext } from "react";
 import iconsWhite from "@/constants/icons-white";
-import data from "@/constants/data";
-import iconsColor from "@/constants/icons-color";
+
 import { useNavigation, useRouter } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import { DrawerActions } from "@react-navigation/native";
-
+import { GlobalContext } from "@/context/GlobalProvider";
 const Home = () => {
   const systemTheme = useColorScheme(); // Detect system theme
   const [selectedCategoryIndex, setSelectedCategoryIndex] = useState(0); // State to track selected category
   const [searchQuery, setSearchQuery] = useState(""); // State for search query
   const [sortOption, setSortOption] = useState("default"); // 'default', 'price-asc', 'price-desc'
   const [vegFilter, setVegFilter] = useState("all"); // 'all', 'veg', 'non-veg'
+  const { menuData, setMenuData } = useContext(GlobalContext);
   const router = useRouter();
   const navigation = useNavigation(); // Hook to access navigation
 
@@ -57,7 +57,12 @@ const Home = () => {
             systemTheme === "dark" ? "bg-green-500" : "bg-green-400"
           }`}
         >
-          <Image source={item.icon} className="w-10 h-10" />
+          {item.isIconUploaded === true && (
+            <Image source={{ uri: item.icon }} className="w-10 h-10" />
+          )}
+          {item.isIconUploaded === false && (
+            <Image source={item.icon} className="w-10 h-10" />
+          )}
         </View>
         <Text
           className={`mt-2 w-24 truncate text-center font-bold text-lg ${getTextColor()}`}
@@ -138,7 +143,7 @@ const Home = () => {
 
   // Filter dishes based on search query, category, veg filter, and sort option
   const filteredDishes =
-    data.menuData[selectedCategoryIndex]?.dishes
+    menuData[selectedCategoryIndex]?.dishes
       ?.filter((dish) =>
         dish.name.toLowerCase().includes(searchQuery.toLowerCase())
       )
@@ -174,12 +179,12 @@ const Home = () => {
             <Text>
               <MaterialIcons
                 name="menu"
-                size={30}
+                size={40}
                 color={systemTheme === "dark" ? "#fff" : "#000"}
               />
             </Text>
           </TouchableOpacity>
-          <Image
+          {/* <Image
             source={
               data.userData.userProfile
                 ? { uri: data.userData.userProfile }
@@ -200,8 +205,9 @@ const Home = () => {
             <Text className="text-base font-bold text-lg text-zinc-400">
               {data.userData.userResturantName}
             </Text>
-          </View>
+          </View> */}
           <TouchableOpacity
+           className="flex-1"
             onPress={() => router.push("/configuration/configuration")}
           >
             <View
@@ -223,7 +229,7 @@ const Home = () => {
           >
             Categories
           </Text>
-          {data.menuData.length === 0 ? (
+          {menuData.length === 0 ? (
             <View className="h-40 border border-2 mt-5 mx-5 rounded-2xl border-gray-400 border-dashed">
               <Text className={`my-auto text-center ${getTextColor()}`}>
                 No categories available.{"\n"}Click on edit icon to customize
@@ -233,7 +239,7 @@ const Home = () => {
           ) : (
             <FlatList
               className="p-5"
-              data={data.menuData}
+              data={menuData}
               horizontal
               renderItem={renderCategory}
               keyExtractor={(item, index) => index.toString()}

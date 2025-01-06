@@ -10,7 +10,7 @@ import {
 
 import Cart from "./(drawer)/Cart";
 import Home from "./home";
-
+import Configuration from "../configuration/configuration";
 // Drawer Navigator
 const Drawer = createDrawerNavigator();
 
@@ -111,11 +111,31 @@ const DrawerLayout = () => {
                 { backgroundColor: iconBgColor }, // Set dynamic background color
               ]}
             >
-              <MaterialIcons name="shopping-cart" size={size} color={iconColor} />
+              <MaterialIcons
+                name="shopping-cart"
+                size={size}
+                color={iconColor}
+              />
             </View>
           ),
         }}
       />
+      {/* <Drawer.Screen
+        name="Configuration"
+        component={Configuration}
+        options={{
+          drawerIcon: ({ color, size }) => (
+            <View
+              style={[
+                styles.iconContainer,
+                { backgroundColor: iconBgColor }, // Set dynamic background color
+              ]}
+            >
+              <MaterialIcons name="settings" size={size} color={iconColor} />
+            </View>
+          ),
+        }}
+      /> */}
     </Drawer.Navigator>
   );
 };

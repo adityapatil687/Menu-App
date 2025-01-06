@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   TextInput,
   View,
@@ -10,13 +10,19 @@ import {
 import { useColorScheme } from "react-native"; // Detect system theme
 import * as ImagePicker from "expo-image-picker"; // Image picker for icon
 import * as FileSystem from "expo-file-system"; // To check image size
-import data from "@/constants/data";
+import { GlobalContext } from "@/context/GlobalProvider";
 
-const AddCategoryForm = ({ closeModal }: { closeModal: () => void }) => {
+interface AddCategoryFormProps {
+  closeModal: () => void;
+}
+
+const AddCategoryForm: React.FC<AddCategoryFormProps> = ({ closeModal }) => {
   const systemTheme = useColorScheme(); // Get system theme (dark or light)
   const [categoryName, setCategoryName] = useState(""); // State for category name
   const [categoryIcon, setCategoryIcon] = useState<string | null>(null); // State for the category icon
+  const [isIconUploaded, setIsIconUploaded] = useState(false); // State for tracking if icon is uploaded
   const [focusedField, setFocusedField] = useState<string | null>(null); // State for tracking the focused field
+  const { menuData, setMenuData } = useContext(GlobalContext); // Access menuData from context
 
   // Function to handle the image picker for category icon
   const handleImagePick = async () => {
@@ -25,10 +31,12 @@ const AddCategoryForm = ({ closeModal }: { closeModal: () => void }) => {
         allowsEditing: true,
         aspect: [1, 1],
         quality: 1,
+        base64: true, // Enable base64 encoding
       });
 
       if (!result.canceled) {
         const imageUri = result.assets[0].uri;
+        const base64Image = result.assets[0].base64 || "";
 
         // Validate image file type and size
         const fileExtension = imageUri.split(".").pop()?.toLowerCase();
@@ -38,10 +46,7 @@ const AddCategoryForm = ({ closeModal }: { closeModal: () => void }) => {
         }
 
         // Check image size (less than 64 KB)
-        const base64Image = await FileSystem.readAsStringAsync(imageUri, {
-          encoding: FileSystem.EncodingType.Base64,
-        });
-        const fileSizeInBytes = (base64Image.length * 3) / 4; // Approximate size in bytes
+        const fileSizeInBytes = base64Image ? (base64Image.length * 3) / 4 : 0; // Approximate size in bytes
         if (fileSizeInBytes > 64000) {
           Alert.alert(
             "File size too large",
@@ -50,7 +55,8 @@ const AddCategoryForm = ({ closeModal }: { closeModal: () => void }) => {
           return;
         }
 
-        setCategoryIcon(imageUri);
+        setCategoryIcon(`data:image/png;base64,${base64Image}`);
+        setIsIconUploaded(true); // Set isIconUploaded to true
       } else {
         Alert.alert("No image selected", "Please select an image.");
       }
@@ -73,12 +79,14 @@ const AddCategoryForm = ({ closeModal }: { closeModal: () => void }) => {
     const newCategory = {
       id: categoryName.toLowerCase().replace(/\s+/g, "_"), // Generate unique ID
       category: categoryName,
-      icon: categoryIcon, // Use selected icon URI
+      icon: categoryIcon, // Use selected icon base64 string
+      isIconUploaded: isIconUploaded, // Set isIconUploaded
       dishes: [], // Start with an empty dishes array
     };
 
     // Add the new category to menuData
-    data.menuData.push(newCategory);
+    const updatedMenuData = [...menuData, newCategory];
+    setMenuData(updatedMenuData);
 
     // Notify user and close modal
     Alert.alert("Category Added", `Category: ${categoryName}`);
@@ -147,4 +155,3 @@ const AddCategoryForm = ({ closeModal }: { closeModal: () => void }) => {
 };
 
 export default AddCategoryForm;
-
